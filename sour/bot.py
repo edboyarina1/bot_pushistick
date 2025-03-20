@@ -1,85 +1,55 @@
-import telebot
-from apscheduler.schedulers.background import BackgroundScheduler
-from google_sheets import get_notifications_data, get_user_sessions
-from buttons import create_buttons
-import logging
 import os
+import logging
 from dotenv import load_dotenv
+import telebot
+from google_sheets import fetch_data, get_tomorrow_lessons, get_ungraded_lessons
 
-load_dotenv()  
+load_dotenv()
 
-API_TOKEN = os.getenv('API_TOKEN')
-OWNER_CHAT_ID = os.getenv('OWNER_CHAT_ID')
-
-bot = telebot.TeleBot(API_TOKEN)
-scheduler = BackgroundScheduler()
+BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+TOKEN_FOR_TABLE = os.getenv('TOKEN_FOR_TABLE')
+SHEET_NAME = os.getenv('sheet_name')
+OWNER_CHAT_ID = int(os.getenv('OWNER_CHAT_ID'))  
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 def create_bot():
-    @bot.message_handler(commands=['start'])
-    def send_welcome(message):
-        chat_id = message.chat.id
-        username = message.chat.username
-        with open("chat_ids.txt", "a") as file:
-            file.write(f"{chat_id}, {username}\n")
-        markup = create_buttons()
-        bot.send_message(chat_id, "Этот бот используется для отправки уведомлений!", reply_markup=markup)
-        logger.info("New user started the bot: %s, %s", chat_id, username)
+    bot = telebot.TeleBot(BOT_TOKEN)
 
-    @bot.message_handler(commands=['notify'])
-    def send_notifications(message):
-        notifications = get_notifications_data()
-        for notification in notifications:
-            schedule_notification(notification)
-        bot.reply_to(message, "Уведомления запланированы.")
+    @bot.message_handler(commands=['push'])
+    def send_tomorrow_notifications(message):
+        """Отправляет уведомления преподавателям о занятиях на завтра"""
+        df = fetch_data(TOKEN_FOR_TABLE, SHEET_NAME)
+        lessons = get_tomorrow_lessons(df)
 
-    @bot.message_handler(commands=['test_notify'])
-    def test_notifications(message):
-        notifications = get_notifications_data()
-        for notification in notifications:
-            logger.info("Sending test message to OWNER_CHAT_ID: %s", OWNER_CHAT_ID)
-            bot.send_message(OWNER_CHAT_ID, "hi")
-        bot.reply_to(message, "Тестовые уведомления отправлены.")
+        if lessons.empty:
+            bot.send_message(OWNER_CHAT_ID, "На завтра нет запланированных занятий")
+            return
 
-    @bot.message_handler(commands=['my_students'])
-    def my_students(message):
-        username = message.chat.username
-        sessions = get_user_sessions(username)
-        if sessions:
-            response = "Ваши запланированные занятия:\n"
-            for session in sessions:
-                response += f"Студент: {session['student']}, Дата: {session['date']}, Время: {session['time']}\n"
-        else:
-            response = "У вас нет запланированных занятий."
-        bot.reply_to(message, response)
+        for _, row in lessons.iterrows():
+            username = row['Телеграмм']
+            student = row['Студент']
+            time = row['Время']
+            text = f"{username}, завтра ({row['Дата'].strftime('%d.%m.%Y')}) у вас занятие со студентом {student} в {time}."
+            bot.send_message(OWNER_CHAT_ID, text)
 
+
+    @bot.message_handler(commands=['check'])
+    def send_ungraded_notifications(message):
+        """Напоминалка о оценках"""
+        df = fetch_data(TOKEN_FOR_TABLE, SHEET_NAME)
+        ungraded_lessons = get_ungraded_lessons(df)
+
+        if ungraded_lessons.empty:
+            bot.send_message(OWNER_CHAT_ID, "Все занятия оценены.")
+            return
+
+        for _, row in ungraded_lessons.iterrows():
+            username = row['Телеграмм']
+            student = row['Студент']
+            lesson_date = row['Дата'].strftime('%d.%m.%Y')
+            time = row['Время']
+            text = f"@{username}, вы не поставили оценку студенту {student} за занятие {lesson_date} в {time}."
+            bot.send_message(OWNER_CHAT_ID, text)
 
     return bot
-
-def schedule_notification(notification):
-    """
-    Планирует отправку уведомления на заданное время.
-    """
-    scheduler.add_job(
-        send_notification,
-        'date',
-        run_date=notification['notification_time'],
-        args=[notification['telegram_id'], notification['message']]
-    )
-    logger.info("Notification scheduled for %s at %s", 
-                notification['telegram_id'], notification['notification_time'])
-
-def send_notification(telegram_id, message):
-    try:
-        bot.send_message(telegram_id, message)
-        logger.info("Notification sent to %s", telegram_id)
-    except Exception as e:
-        logger.error("Failed to send notification to %s: %s", telegram_id, e)
-
-scheduler.start()
-
-if __name__ == "__main__":
-    bot = create_bot()
-    bot.polling()
