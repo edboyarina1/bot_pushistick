@@ -1,15 +1,16 @@
 import os
 import logging
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 import telebot
-from google_sheets import fetch_data, get_tomorrow_lessons, get_ungraded_lessons
+from sour.google_sheets import fetch_data, get_tomorrow_lessons, get_ungraded_lessons
 
-load_dotenv()
+env_path = find_dotenv("../.env")
+load_dotenv(env_path)
 
-BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+BOT_TOKEN = os.getenv('API_TOKEN')
 TOKEN_FOR_TABLE = os.getenv('TOKEN_FOR_TABLE')
 SHEET_NAME = os.getenv('sheet_name')
-OWNER_CHAT_ID = int(os.getenv('OWNER_CHAT_ID'))  
+OWNER_CHAT_ID = os.getenv('OWNER_CHAT_ID')  
 
 logging.basicConfig(level=logging.INFO)
 
@@ -49,7 +50,7 @@ def create_bot():
             student = row['Студент']
             lesson_date = row['Дата'].strftime('%d.%m.%Y')
             time = row['Время']
-            text = f"@{username}, вы не поставили оценку студенту {student} за занятие {lesson_date} в {time}."
+            text = f"{username}, вы не поставили оценку студенту {student} за занятие {lesson_date} в {time}."
             bot.send_message(OWNER_CHAT_ID, text)
 
     return bot

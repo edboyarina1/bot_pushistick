@@ -1,9 +1,7 @@
 import os
-from dotenv import load_dotenv
 import pandas as pd
 from datetime import datetime, timedelta
 
-load_dotenv()
 
 def fetch_data(token: str, sheet_name: str) -> pd.DataFrame:
     google_sheets_link = "https://docs.google.com/spreadsheets/d/"

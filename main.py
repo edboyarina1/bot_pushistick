@@ -1,4 +1,4 @@
-from bot import create_bot
+from sour.bot import create_bot
 
 def main():
     bot = create_bot()
