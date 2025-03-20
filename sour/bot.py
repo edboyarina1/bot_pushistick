@@ -6,7 +6,7 @@ import logging
 import os
 from dotenv import load_dotenv
 
-load_dotenv()  # Загружаем переменные окружения из файла .env
+load_dotenv()  
 
 API_TOKEN = os.getenv('API_TOKEN')
 OWNER_CHAT_ID = os.getenv('OWNER_CHAT_ID')
@@ -55,15 +55,6 @@ def create_bot():
             response = "У вас нет запланированных занятий."
         bot.reply_to(message, response)
 
-    @bot.message_handler(commands=['stop'])
-    def stop_bot(message):
-        if message.chat.id == int(OWNER_CHAT_ID):
-            bot.send_message(message.chat.id, "Бот останавливается...")
-            logger.info("Bot is stopping by request from %s", message.chat.id)
-            bot.stop_polling()
-        else:
-            bot.send_message(message.chat.id, "У вас нет прав для остановки бота.")
-            logger.warning("Unauthorized stop request from %s", message.chat.id)
 
     return bot
 
