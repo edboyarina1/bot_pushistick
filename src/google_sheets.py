@@ -13,7 +13,7 @@ def fetch_data(token: str, sheet_name: str) -> pd.DataFrame:
 
 
 def get_tomorrow_lessons(df: pd.DataFrame) -> pd.DataFrame:
-    """Фильтрует занятия, которые запланированы на завтра."""
+    """Фильтрует занятия, которые запланированы на будущее."""
     tomorrow = datetime.today().date() + timedelta(days=1)
     return df[df['Дата'].dt.date == tomorrow]
 
