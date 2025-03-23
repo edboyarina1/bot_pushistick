@@ -1,11 +1,16 @@
+import yaml
 from src.bot import create_bot
 
 def main():
-    # cfg = yaml.read ...
-    # cfg = cfg[cfg['mode']]
+    with open('config.yaml', 'r') as config_file:
+        config = yaml.safe_load(config_file)
 
-    bot = create_bot()
+    mode = config['mode']
+    config = config[mode]
+
+    bot = create_bot(config)
     bot.polling()
+
 if __name__ == "__main__":
     main()
 

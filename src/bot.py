@@ -1,17 +1,19 @@
-import os
 import logging
-from dotenv import load_dotenv, find_dotenv
 import telebot
+import yaml
 from src.google_sheets import fetch_data, get_tomorrow_lessons, get_ungraded_lessons
 
-env_path = find_dotenv("../.env")
-load_dotenv(env_path)
 
-# TODO: заменить на конфиг
-BOT_TOKEN = os.getenv('API_TOKEN')
-TOKEN_FOR_TABLE = os.getenv('TOKEN_FOR_TABLE')
-SHEET_NAME = os.getenv('sheet_name')
-OWNER_CHAT_ID = os.getenv('OWNER_CHAT_ID')  
+with open('../config.yaml', 'r') as config_file:
+    config = yaml.safe_load(config_file)
+
+mode = config['mode']
+config = config[mode]
+
+BOT_TOKEN = config['API_TOKEN']
+TOKEN_FOR_TABLE = config['TOKEN_FOR_TABLE']
+SHEET_NAME = config['sheet_name']
+OWNER_CHAT_ID = config['OWNER_CHAT_ID']
 
 logging.basicConfig(level=logging.INFO)
 
@@ -57,7 +59,7 @@ def create_bot():
         for _, row in ungraded_lessons.iterrows():
             username = row['Телеграмм']
             student = row['Студент']
-            lesson_date = row['Дата'].strftime('%d.%m.%Y')
+            lesson_date = row['Дата'].strftime('%d.%м.%Y')
             time = row['Время']
             if username not in messages:
                 messages[username] = []
