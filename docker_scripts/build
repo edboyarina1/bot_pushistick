@@ -1,0 +1,3 @@
+source credentials
+
+docker build -t ${DOCKER_NAME} . 

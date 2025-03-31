@@ -1,0 +1,4 @@
+#! /bin/bash
+source credentials
+
+docker run -dit --name ${CONTAINER_NAME} --restart on-failure -v ${SRC}:/app ${DOCKER_NAME}
