@@ -1,15 +1,11 @@
-import yaml
+from src.utils import load_config
 from src.bot import create_bot
 
 def main():
-    with open('config.yaml', 'r') as config_file:
-        config = yaml.safe_load(config_file)
-
-    mode = config['mode']
-    config = config[mode]
+    config = load_config()
 
     bot = create_bot(config)
-    bot.polling()
+    bot.polling(none_stop=True, interval=0, timeout=123)
 
 if __name__ == "__main__":
     main()
