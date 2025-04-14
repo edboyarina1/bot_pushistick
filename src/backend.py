@@ -34,7 +34,7 @@ def send_ungraded_notifications(bot, config):
         for _, row in ungraded_lessons.iterrows():
             username = row['Телеграмм']
             student = row['Студент']
-            lesson_date = row['Дата'].strftime('%d.%м.%Y')
+            lesson_date = row['Дата'].strftime('%d.%m.%Y')
             time = row['Время']
             if username not in messages:
                 messages[username] = []
