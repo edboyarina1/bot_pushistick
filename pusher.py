@@ -1,5 +1,4 @@
 import logging
-
 from telebot import TeleBot
 from src.utils import load_config
 from src.backend import send_tomorrow_notifications

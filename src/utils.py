@@ -6,3 +6,8 @@ def load_config(path='config.yaml'):
         config = yaml.safe_load(config_file)
     mode = config['mode']
     return config[mode]
+
+def is_admin(username: str, config) -> bool:
+    """Проверяет, является ли пользователь админом."""
+    admins = config.get('admins', [])
+    return username in admins
