@@ -20,7 +20,6 @@ def get_tomorrow_lessons(df: pd.DataFrame) -> pd.DataFrame:
 def get_ungraded_lessons(df: pd.DataFrame) -> pd.DataFrame:
     """Фильтрует занятия в прошлом без оценки."""
     today = datetime.today().date()
-    print(df[(df['Дата'].dt.date < today) & df['Оценка'].isna()])
     return df[(df['Дата'].dt.date < today) & df['Оценка'].isna()]
 
 def get_future_lessons_for_user(df: pd.DataFrame, username: str) -> pd.DataFrame:

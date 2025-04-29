@@ -11,7 +11,6 @@ def send_tomorrow_notifications(bot, config):
             username = row['Телеграмм']
             student = row['Студент']
             time = row['Время']
-            print("{", row['Дата'], "}", type(row['Дата']), sep="")
             date = row['Дата'].strftime(r'%d.%m.%Y')
             if username not in messages:
                 messages[username] = []
@@ -28,8 +27,6 @@ def send_ungraded_notifications(bot, config):
     """Напоминалка о непоставленных оценках"""
     df = fetch_data(config['table_token'], config['sheet_name'])
     ungraded_lessons = get_ungraded_lessons(df)
-    print(df['Дата'])
-    print(ungraded_lessons['Дата'])
     
     if not ungraded_lessons.empty:
         messages = {}
