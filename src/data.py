@@ -24,4 +24,4 @@ def get_ungraded_lessons(df: pd.DataFrame) -> pd.DataFrame:
 def get_future_lessons_for_user(df: pd.DataFrame, username: str) -> pd.DataFrame:
     """Фильтрует предстоящие занятия для конкретного пользователя"""
     today = datetime.today().date()
-    return df[(df['Телеграмм'] == username) & (df['Дата'].dt.date >= today)]
+    return df[(df['Телеграмм'] == username.lower()) & (df['Дата'].dt.date >= today)]
