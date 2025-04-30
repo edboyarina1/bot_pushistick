@@ -10,5 +10,6 @@ def load_config(path='config.yaml'):
 def is_admin(username: str, config) -> bool:
     """Проверяет, является ли пользователь админом."""
     admins = config.get('admins', [])
-    admins = [adm.lower() for adm in admins]
+    if len(admins) > 0:
+        admins = [adm.lower() for adm in admins]
     return username.lower() in admins

@@ -57,10 +57,12 @@ def send_user_lessons(bot, config, chat_id, username):
 
     message_lines = []
     for _, row in user_lessons.iterrows():
-        date = row['Дата'].strftime(r'%d.%m.%Y')
+        date = row['Дата']
+        day = date.day
+        month = date.strftime("%B")
         student = row['Студент']
-        time = row['Время']
-        message_lines.append(f"{date}, студент {student}, время {time}")
+        time = str(row['Время'])[:-3]
+        message_lines.append(f"{day} {month}, студент {student}, время {time}")
     
     full_message = "Ваши предстоящие занятия:\n\n" + "\n".join(message_lines)
     bot.send_message(chat_id, full_message)
