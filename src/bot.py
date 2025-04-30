@@ -15,25 +15,26 @@ def create_bot(config):
         if is_admin(f"@{username}", config):
             bot.send_message(message.chat.id, "Добро пожаловать, господин администратор!", reply_markup=get_admin_keyboard())
         else:
-            bot.send_message(message.chat.id, "Привет", reply_markup=get_user_keyboard())
+            bot.send_message(message.chat.id, "привет!", reply_markup=get_user_keyboard())
 
-    @bot.message_handler(commands=['push'])
+    @bot.message_handler(func=lambda message: message.text == 'Напоминалка')
     def send_tomorrow_notifications_bot(message):
         if is_admin(f"@{message.from_user.username}", config):
             send_tomorrow_notifications(bot, config)
         else:
             bot.send_message(message.chat.id, "У вас нет прав для этой команды.")
 
-    @bot.message_handler(commands=['check'])
+    @bot.message_handler(func=lambda message: message.text == 'Проверить оценки')
     def send_ungraded_notifications_bot(message):
         if is_admin(f"@{message.from_user.username}", config):
             send_ungraded_notifications(bot, config)
         else:
             bot.send_message(message.chat.id, "У вас нет прав для этой команды.")
 
-    @bot.message_handler(commands=['my_lessons'])
+    @bot.message_handler(func=lambda message: message.text == 'Мои занятия')
     def send_user_lessons_bot(message):
         username = f"@{message.from_user.username}"
         send_user_lessons(bot, config, message.chat.id, username)
 
     return bot
+

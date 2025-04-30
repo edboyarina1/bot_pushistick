@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 def fetch_data(token: str, sheet_name: str) -> pd.DataFrame:
     google_sheets_link = "https://docs.google.com/spreadsheets/d/"
     load_path = f"{google_sheets_link}{token}/export?format=xlsx"
-    print(load_path)
     df = pd.read_excel(load_path, sheet_name=sheet_name)
     df['Дата'] = pd.to_datetime(df['Дата'], dayfirst=True)  
     return df

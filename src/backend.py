@@ -34,9 +34,7 @@ def send_ungraded_notifications(bot, config):
             username = row['Телеграмм']
             student = row['Студент']
             
-            print("{", row['Дата'], "}", type(row['Дата']), sep="")
             lesson_date = row['Дата'].strftime(r'%d.%m.%Y')
-            print("done")
             time = row['Время']
             if username not in messages:
                 messages[username] = []
@@ -66,3 +64,4 @@ def send_user_lessons(bot, config, chat_id, username):
     
     full_message = "Ваши предстоящие занятия:\n\n" + "\n".join(message_lines)
     bot.send_message(chat_id, full_message)
+
